@@ -11,8 +11,6 @@ import java.nio.file.Paths
 import java.nio.file.Files
 import java.nio.file.StandardOpenOption
 
-import com.nitro.scalaAvro.codegen.SchemaParser
-
 class AvModuleSpec extends PropSpec with Matchers {
   def bounce(avsc: AvSchema): AvSchema =
     avsc.toJson.toString.parseJson.convertTo[AvSchema]
