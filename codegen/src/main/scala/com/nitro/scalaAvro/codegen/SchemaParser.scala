@@ -35,27 +35,15 @@ object SchemaParser {
   def getSchemas(files: Iterable[File]): Seq[(String, Either[AvroRecord, AvroEnum])] = {
     val parserForAvsc = new Parser()
     val schemas: Seq[Schema] = {
-
       import spray.json._
       import PartialAvroJsonProtocol._
-
       val avscDocs = files
         .filter(_.getName.endsWith("avsc"))
-
       val avscStrs =
         avscDocs
           .map { fi => new String(Files.readAllBytes(fi.toPath)) }
 
       checkSanity(avscDocs, parserForAvsc)
-
-      /*     Try(avscStrs.map { parserForAvsc.parse }) match {
-        case Failure(e) =>
-          println("Failed to parse at least one .avsc file")
-          throw e
-
-        case _ =>
-      }*/
-
       val avspStrs =
         files
           .filter(_.getName.endsWith("avsp"))
