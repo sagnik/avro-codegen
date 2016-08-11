@@ -9,13 +9,28 @@ import org.apache.avro.Schema.Type._
 import org.apache.avro.file.DataFileReader
 import org.apache.avro.generic.{ GenericDatumReader, GenericRecord }
 import java.io.File
+
 import RichAvro._
 
 import collection.JavaConversions._
 import collection.JavaConverters._
-import scala.util.{ Failure, Try }
+import scala.util.{ Failure, Success, Try }
 
 object SchemaParser {
+  lazy val checkSanity = (avscDocs: Iterable[File], parserForAvsc: Parser) => {
+    avscDocs.map {
+      avscDoc =>
+        {
+          val avscStr = new String(Files.readAllBytes(avscDoc.toPath))
+          Try(parserForAvsc.parse(avscStr)) match {
+            case Failure(e) =>
+              println(s"Failed to parse $avscDoc")
+              throw e
+            case Success(schema) =>
+          }
+        }
+    }
+  }
   //map package name to schema
   def getSchemas(files: Iterable[File]): Seq[(String, Either[AvroRecord, AvroEnum])] = {
     val parserForAvsc = new Parser()
@@ -24,18 +39,22 @@ object SchemaParser {
       import spray.json._
       import PartialAvroJsonProtocol._
 
+      val avscDocs = files
+        .filter(_.getName.endsWith("avsc"))
+
       val avscStrs =
-        files
-          .filter(_.getName.endsWith("avsc"))
+        avscDocs
           .map { fi => new String(Files.readAllBytes(fi.toPath)) }
 
-      Try(avscStrs.map { parserForAvsc.parse }) match {
+      checkSanity(avscDocs, parserForAvsc)
+
+      /*     Try(avscStrs.map { parserForAvsc.parse }) match {
         case Failure(e) =>
           println("Failed to parse at least one .avsc file")
           throw e
 
         case _ =>
-      }
+      }*/
 
       val avspStrs =
         files

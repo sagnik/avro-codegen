@@ -1,12 +1,17 @@
 package com.nitro.scalaAvro
 
+import java.io.File
+
 import org.scalatest._
 import spray.json._
 import PartialAvroJsonProtocol._
+
 import language.reflectiveCalls
 import java.nio.file.Paths
 import java.nio.file.Files
 import java.nio.file.StandardOpenOption
+
+import com.nitro.scalaAvro.codegen.SchemaParser
 
 class AvModuleSpec extends PropSpec with Matchers {
   def bounce(avsc: AvSchema): AvSchema =
